@@ -10,14 +10,19 @@ import reactor.core.scheduler.Schedulers;
  * @author fade
  * @date 2022/03/26
  */
-public class ThreadingAndSchedulers {
+public class PublishOn {
 
     public static void main(String[] args) {
         // publishOn
+        // affects where the subsequent operators execute
+        // (until another publishOn is chained in)
         Scheduler s = Schedulers.newParallel("parallel-scheduler", 4);
         final Flux<String> flux = Flux
                 .range(1, 2)
-                .map(i -> 10 + i)
+                .map(i -> {
+                    System.out.println("["+ Thread.currentThread().getName() +"] first map: " + i);
+                    return 10 + i;
+                })
                 .publishOn(s)
                 .map(i -> "["+ Thread.currentThread().getName() +"] value:" + i);
 
